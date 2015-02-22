@@ -19,7 +19,7 @@ from .rpc import Object
 from .rpc import Common
 from .rpc import Workflow
 
-__all__ = ['OpenERP', 'get_object', 'get_data_from_record', 'login']
+__all__ = ['OpenERP', 'get_object', 'get_data_from_record']
 
 def get_object(object_name):
     context = {
@@ -136,5 +136,3 @@ class OpenERP(object):
 
     def login(self, username, password):
         return Common(self.connector).login(self.app.config['OPENERP_DATABASE'], username, password)
-
-

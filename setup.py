@@ -18,8 +18,7 @@ setup(
     author_email='stephane@wirtel.be',
     description='OpenERP Connector for Flask',
     long_description=__doc__,
-    packages=['flaskext'],
-    namespace_packages=['flaskext'],
+    packages=['flask_openerp'],
     zip_safe=False,
     platforms='any',
     install_requires=[
