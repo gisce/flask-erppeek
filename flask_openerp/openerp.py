@@ -12,20 +12,15 @@ from flask import session
 from flask import g
 from flask import abort
 
-from .rpc import NetRPCConnector
-from .rpc import XmlRPCConnector
-from .rpc import Connection
-from .rpc import Object
-from .rpc import Common
-from .rpc import Workflow
+from erppeek import Client
+
 
 __all__ = ['OpenERP', 'get_object', 'get_data_from_record']
 
+
 def get_object(object_name):
-    context = {
-        'lang' :  g.user_language,
-    }
-    return Object(g.openerp_cnx, object_name, context)
+    return g.openerp_cnx.model(object_name)
+
 
 def get_data_from_record(object_name, record_ids, fields=None):
     if fields is None:
@@ -38,6 +33,7 @@ def get_data_from_record(object_name, record_ids, fields=None):
         abort(404)
 
     return records
+
 
 class OpenERP(object):
     """
@@ -61,8 +57,7 @@ class OpenERP(object):
             return app
     """
     def __init__(self, app=None):
-        self.default_user_id = None
-        self.connector = None
+        self.default_user = None
         if app is not None:
             self.app = app
             self.init_app(self.app)
@@ -73,9 +68,7 @@ class OpenERP(object):
         """This callback can be used to initialize an application for use with
         the OpenERP server.
         """
-        app.config.setdefault('OPENERP_PROTOCOL', 'netrpc')
-        app.config.setdefault('OPENERP_PORT', 8070)
-        app.config.setdefault('OPENERP_HOSTNAME', 'localhost')
+        app.config.setdefault('OPENERP_SERVER', 'http://localhost:8069')
         app.config.setdefault('OPENERP_DATABASE', 'openerp')
         app.config.setdefault('OPENERP_DEFAULT_USER', 'admin')
         app.config.setdefault('OPENERP_DEFAULT_PASSWORD', 'admin')
@@ -84,38 +77,29 @@ class OpenERP(object):
             get_data_from_record=get_data_from_record
         )
 
-        protocol = app.config['OPENERP_PROTOCOL'].lower()
+        cnx = Client(
+            server=app.config['OPENERP_SERVER'],
+            db=app.config['OPENERP_DATABASE'],
+            user=app.config['OPENERP_DEFAULT_USER'],
+            password=app.config['OPENERP_DEFAULT_PASSWORD']
+        )
 
-        klass = {'netrpc' : NetRPCConnector,
-                 'xmlrpc' : XmlRPCConnector}.get(protocol, False)
-
-        if not klass:
-            raise ValueError('This protocol is not handled by Flask-OpenERP')
-
-        self.connector = klass(app.config['OPENERP_HOSTNAME'],
-                               app.config['OPENERP_PORT'])
-
-        cnx = Connection(self.connector,
-                              app.config['OPENERP_DATABASE'],
-                              app.config['OPENERP_DEFAULT_USER'],
-                              app.config['OPENERP_DEFAULT_PASSWORD'])
-
-        self.default_user_id = cnx.user_id
+        self.default_user = cnx.user
 
         app.before_request(self.before_request)
 
     def before_request(self):
-        user_id = session.get('openerp_user_id', self.default_user_id) \
-            or self.default_user_id
+        user = session.get('openerp_user', self.default_user)
 
         password = session.get('openerp_password',
-                               self.app.config['OPENERP_DEFAULT_PASSWORD']) \
-            or self.app.config['OPENERP_DEFAULT_PASSWORD']
+                               self.app.config['OPENERP_DEFAULT_PASSWORD'])
 
-        g.openerp_cnx = Connection(self.connector,
-                                   self.app.config['OPENERP_DATABASE'],
-                                   user_id = user_id,
-                                   password = password)
+        g.openerp_cnx = Client(
+            server=self.app.config['OPENERP_SERVER'],
+            db=self.app.config['OPENERP_DATABASE'],
+            user=user,
+            password=password
+        )
 
     def __repr__(self):
         app = None
@@ -128,11 +112,11 @@ class OpenERP(object):
                 app = ctx.app
         return '<%s openerp=%r>' % (
             self.__class__.__name__,
-            app and ("%s://%s:%d/%s" % (app.config['OPENERP_PROTOCOL'],
-                                        app.config['OPENERP_HOSTNAME'],
-                                        app.config['OPENERP_PORT'],
-                                        app.config['OPENERP_DATABASE'])) or None
+            app and "{0}/{1}".format(
+                app.config['OPENERP_SERVER'], app.config['OPENERP_DATABASE']
+            )
         )
 
     def login(self, username, password):
-        return Common(self.connector).login(self.app.config['OPENERP_DATABASE'], username, password)
+        c = Client(app.config['OPENERP_SERVER'])
+        return c.login(user, password, app.config['OPENERP_DATABASE'])

@@ -8,16 +8,14 @@
 
 """
 from flask import Flask
-from flask import g
-from flaskext.openerp import OpenERP, Object
+from flask import g, json, Response
+from flask.ext.openerp import OpenERP, get_object
 
 class DefaultConfig(object):
-    OPENERP_PROTOCOL = 'netrpc'
-    OPENERP_HOSTNAME = 'localhost'
-    OPENERP_DATABASE = 'openerp'
+    OPENERP_SERVER = 'http://localhost:8069'
+    OPENERP_DATABASE = 'oerp5'
     OPENERP_DEFAULT_USER = 'admin'
     OPENERP_DEFAULT_PASSWORD = 'admin'
-    OPENERP_PORT = 8070
 
     SECRET_KEY = 'secret_key'
 
@@ -29,10 +27,8 @@ OpenERP(app)
 
 @app.route('/')
 def index():
-    proxy = Object(g.openerp_cnx, 'res.users')
-    users = proxy.select([], ['name', 'login'])
+    proxy = get_object('res.users')
+    users = proxy.read([], ['name', 'login'])
+    return Response(json.dumps(users), mimetype='application/json')
 
-    return str(users)
-
-app.run()
-
+app.run(debug=True)
