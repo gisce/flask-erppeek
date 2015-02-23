@@ -9,7 +9,8 @@
 """
 from flask import Flask
 from flask import g
-from flaskext.openerp import OpenERP, Object, Workflow
+from flask.ext.openerp import OpenERP
+
 
 class DefaultConfig(object):
     OPENERP_PROTOCOL = 'xmlrpc'
@@ -27,15 +28,14 @@ app = Flask(__name__)
 app.config.from_object(DefaultConfig())
 OpenERP(app)
 
+
 @app.route('/')
 def index():
 
-    wkf_service = Workflow(g.openerp_cnx)
-
-    proxy = Object(g.openerp_cnx, 'sale.order')
-    so_id = proxy.search([('state', '=', 'draft')], limit=1)
+    sale_obj = g.openerp_cnx.model('sale.order')
+    so_id = sale_obj.search([('state', '=', 'draft')], limit=1)
     
-    wkf_service.execute_wkf('order_confirm', 'sale.order', so_id[0])    
+    g.openerp_cnx.exec_workflow('sale.order', 'order_confirm', so_id[0])
 
     return ""
 
