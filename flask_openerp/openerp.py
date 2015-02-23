@@ -114,7 +114,7 @@ class OpenERP(object):
             self.__class__.__name__,
             app and "{0}/{1}".format(
                 app.config['OPENERP_SERVER'], app.config['OPENERP_DATABASE']
-            )
+            ) or ''
         )
 
     def login(self, username, password):
