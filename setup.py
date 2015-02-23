@@ -23,6 +23,7 @@ setup(
     platforms='any',
     install_requires=[
         'Flask',
+        'erppeek'
     ],
     classifiers=[
         'Environment :: Web Environment',
