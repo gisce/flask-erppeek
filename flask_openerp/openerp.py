@@ -118,5 +118,5 @@ class OpenERP(object):
         )
 
     def login(self, username, password):
-        c = Client(app.config['OPENERP_SERVER'])
-        return c.login(user, password, app.config['OPENERP_DATABASE'])
+        c = Client(self.app.config['OPENERP_SERVER'])
+        return c.login(username, password, self.app.config['OPENERP_DATABASE'])
