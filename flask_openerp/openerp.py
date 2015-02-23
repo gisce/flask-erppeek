@@ -29,7 +29,7 @@ def get_data_from_record(object_name, record_ids, fields=None):
     proxy = get_object(object_name)
     records = proxy.read(record_ids, fields)
 
-    if records == False:
+    if not records:
         abort(404)
 
     return records
