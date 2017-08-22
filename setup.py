@@ -1,24 +1,16 @@
 #!/usr/bin/env python
-"""
-    setup.py
-    ~~~~~~~~
 
-    :copyright: 2011 - 2013 Stephane Wirtel <stephane@wirtel.be>
-    :license: BSD
-"""
-
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
-    name='Flask-OpenERP',
-    version='0.3.1',
-    url='https://github.com/matrixise/flask-openerp/',
+    name='flask-erppeek',
+    version='0.4.0',
+    url='https://github.com/gisce/flask-erppeek',
     license='BSD',
-    author='Stephane Wirtel',
-    author_email='stephane@wirtel.be',
-    description='OpenERP Connector for Flask',
-    long_description=__doc__,
-    packages=['flask_openerp'],
+    author='GISCE-TI, S.L.',
+    author_email='devel@gisce.net',
+    description='ERPPeek Connector for Flask',
+    packages=find_packages(),
     zip_safe=False,
     platforms='any',
     install_requires=[

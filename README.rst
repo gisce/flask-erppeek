@@ -1,10 +1,10 @@
-Flask-OpenERP
+=============
+Flask-ERPPeek
 =============
 
 Introduction
 ============
 
-Flask-OpenERP is an extension for the `Flask`_ micro-framework and `OpenERP`_.
-
-.. _Flask: http://flask.pocoo.org
-.. _OpenERP: http://www.openerp.com
+Flask-ERPPeek is an extension for the `Flask <http://flask.pocoo.org>`_
+micro-framework and `OpenERP <http://www.openerp.com>`_ based
+on `Flask-OpenERP <https://github.com/matrixise/flask-openerp>`_
